@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="style.css">
+    <title>screenshare-webrtc</title>
+</head>
+
+<body>
+    <div class="notifs"></div>
+    <div class="badge hide">NEW FEATURE
+        <p>Try Video Call</p>
+    </div>
+    <div class="container">
+        <div class="panel1">
+            <h1 class="greet">screenshare</h1>
+            <div class="batch">
+                <div class="join">
+                    <input id="call" class="input" placeholder="ID of the user" type="text" spellcheck="false" />
+                    <button id="call" class="btn" onclick="callInit()" class="connect">Connect to a screen</button>
+                    <h2 class="greet">OR</h2>
+                </div>
+                <div class="activeUser hide">
+                    <h3>Remove users</h3>
+                    <input type="text" class="search" placeholder="User's name" onkeyup="search(event)">
+                    <div class="list"></div>
+                </div>
+                <div class="shareScreen">
+                    <h1 id="id"></h1>
+                    <button class="share btn" onclick="share()">Share your screen</button>
+                </div>
+            </div>
+            <video id="v1" autoplay controls></video>
+        </div>
+        <div class="panel2">
+            <div class="chatbox">
+                <h2 class="chatHead">Recent Chat</h2>
+                <div class="msgBox"></div>
+                <div class="sendMsg">
+                    <input type="text" name="message" id="inputMsg" placeholder="Message"
+                        onkeypress="listenEnter(event)" />
+                    <button onclick="handleMsg()" class="sendbtn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@0.3.20/dist/peer.min.js"></script>
+    <script src="client.js"></script>
+</body>
+
+</html>
