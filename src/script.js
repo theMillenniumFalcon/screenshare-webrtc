@@ -1,3 +1,10 @@
+const peer = new peer({
+    config: {
+        'iceServers': [{ url: 'stun:stun.l.google.com:19302' },
+        { url: 'turn:numb.viagenie.ca', username: 'nishankpr2002@gmail.com', credential: 'test' }]
+    }
+})
+
 let username = ''
 let peerId = ''
 let shareStream = ''
@@ -16,7 +23,7 @@ const addMsgtoDOM = (data, type, target = document.querySelector('.msgBox')) => 
         case 'msg':
             target.innerHTML += `<div class='msg'>${data.by}: ${data.msg}</div>`
             break
-        
+
         case 'connection':
             target.innerHTML += `<div class='newConn'>${data.username} joined the session</div>`
             break
@@ -38,11 +45,11 @@ const addMsgtoDOM = (data, type, target = document.querySelector('.msgBox')) => 
                 target.innerHTML = ''
             }, 30000)
             break
-        
+
         case 'remove':
             target.innerHTML += `<div class='listItems' onclick="disconnect('${data.username}')">${data.username}</div>`
             break
-        
+
         case 'clear':
             target.innerHTML = data
             break
