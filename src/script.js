@@ -58,3 +58,30 @@ const addMsgtoDOM = (data, type, target = document.querySelector('.msgBox')) => 
             break
     }
 }
+
+const manageNotifs = (notifs, type) => {
+    addMsgtoDOM(notifs, type, target = document.querySelector('.notifs'))
+}
+
+const handleMsg = () => {
+    const msg = document.querySelector('#inputMsg').value
+    console.log('[SENDING MESSAGE]')
+    if (!isMaster()) {
+        connection.send({ msg, by: username, type: 'msg' })
+    } else {
+        activeUser.forEach((user) => {
+            user.conn.send({ msg, by: username, type: 'msg' })
+        })
+        addMsgtoDOM({ msg, by: username }, 'msg')
+    }
+    document.querySelector('#inputMsg').value = ''
+}
+
+const createEmptyAudioTrack = () => {
+    const ctx = new AudioContext()
+    const oscillator = ctx.createOscillator()
+    const dst = oscillator.connect(ctx.createMediaStreamDestination())
+    oscillator.start()
+    const track = dst.stream.getAudioTracks()[0]
+    return Object.assign(track, { enabled: false })
+}
