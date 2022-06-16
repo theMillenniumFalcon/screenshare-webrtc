@@ -11,7 +11,7 @@ let shareStream = ''
 const activeUser = []
 const vidUser = []
 const colors = ['purple', 'blue', 'brown', 'magenta', 'yellow', 'gray', 'crimson']
-const initpacket = {}
+const initPacket = {}
 let connection
 
 const isMaster = () => {
@@ -84,4 +84,87 @@ const createEmptyAudioTrack = () => {
     oscillator.start()
     const track = dst.stream.getAudioTracks()[0]
     return Object.assign(track, { enabled: false })
+}
+
+const createEmptyVideoTrack = ({ width, height }) => {
+    const canvas = Object.assign(document.createElement('canvas'), { width, height })
+    canvas.getContext('2d').fillRect(0, 0, width, height)
+
+    const stream = canvas.captureStream()
+    const track = stream.getVideoTracks()[0]
+
+    return Object.assign(track, { enabled: false })
+}
+
+const callData = call => {
+    call.on('stream', stream => {
+        console.log('[SUBMITTING DATA]', stream)
+        document.querySelector('#v1').srcObject = stream
+    })
+    call.on('error', err => {
+        alert('[ERROR WHILE RECEIVING]' + err)
+    })
+}
+
+const connectionData = (conn, type) => {
+    conn.on('open', () => {
+        console.log('Connection for data exchange successfully established', conn.metadata)
+        manageNotifs('Succesfully Connected', 'notifSuccess')
+        if (type === 'master') {
+            activeUser.push({ ...conn.metadata, conn, color: colors[activeUser.length] })
+            console.log('[ACTIVE USERS]', activeUser)
+            activeUser.forEach(user => {
+                console.log('[SENDING CONNECTION DATA]')
+                user.conn.send({ ...conn.metadata, type: 'connection' })
+            })
+            document.querySelector('.join').classList.add('hide')
+            document.querySelector('.share').classList.add('hide')
+            document.getElementById('v1').classList.add('hide')
+            document.querySelector('.activeUser').classList.remove('hide')
+        }
+        else {
+            document.querySelector('.shareScreen').classList.add('hide')
+            document.querySelector('.join .greet').classList.add('hide')
+        }
+        connection = conn
+    })
+    conn.on('data', data => {
+        console.log('RECEIVED DATA', data)
+        if (data.type === 'msg')
+            addMsgtoDOM(data, 'msg')
+        else if (data.type === 'connection')
+            addMsgtoDOM(data, 'connection')
+        else if (data.type === 'disconnection')
+            addMsgtoDOM(data, 'disconnection')
+        if (isMaster())
+            activeUser.forEach(user => {
+                user.conn.send(data)
+            })
+    })
+    conn.on('close', () => {
+        addMsgtoDOM(conn.metadata, 'disconnection')
+        activeUser.forEach(user => {
+            user.conn.send({ ...conn.metadata, type: 'disconnection' })
+        })
+    })
+}
+
+const callInit = async () => {
+    try {
+        const audioStream = createEmptyAudioTrack()
+        //const audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        const videoStream = createEmptyVideoTrack({ width: 400, height: 400 })
+        const mediaStream = new MediaStream([audioStream, videoStream])
+        otherUsername = document.querySelector('#call').value
+        // Connect with the pear for data exchange
+        const conn = peer.connect(otherUsername, { metadata: initPacket })
+        connectionData(conn, 'slave')
+
+        // Call the pear for audio and video exchange
+        const call = peer.call(otherUsername, mediaStream)
+        console.log('[CALL INITIALISED]')
+        callData(call)
+    } catch (error) {
+        alert(error)
+    }
 }
