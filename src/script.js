@@ -168,3 +168,64 @@ const callInit = async () => {
         alert(error)
     }
 }
+
+const share = async () => {
+    try {
+        const onError = () => {
+            // alert('Incompatible browser detected');
+            manageNotifs('Incompatible browser detected', 'notifFail')
+        }
+
+        if (navigator.mediaDevices.getDisplayMedia) {
+            const videosStream = await navigator.mediaDevices.getDisplayMedia({ video: true })
+            try {
+                const audioStream = await navigator.mediaDevices.getUserMedia({ video: false, audio: true })
+                const mediaStream = new MediaStream([...videosStream.getVideoTracks(), ...audioStream.getAudioTracks()])
+                shareStream = mediaStream
+            } catch (error) {
+                manageNotifs('Audio source not found or denied', 'notifFail')
+                const audioTrack = createEmptyAudioTrack()
+                const mediaStream = new MediaStream([...videosStream.getVideoTracks(), audioTrack])
+                shareStream = mediaStream
+            }
+            document.querySelector('#id').innerHTML = 'Share this ID: ' + peerId
+        } else {
+            onError()
+        }
+    } catch (error) {
+        alert('[ERROR FROM TRY]' + error)
+    }
+}
+
+const search = event => {
+    console.log(event.target.value)
+    addMsgToDom('', 'clear', document.querySelector('.list'))
+    const str = event.target.value
+    if (str) {
+        const result = activeUser.filter(el => {
+            return el.username.startsWith(str)
+        })
+        console.log(result)
+        result.forEach(el => {
+            addMsgtoDOM(el, 'remove', document.querySelector('.list'))
+        })
+    }
+}
+
+const disconnect = user => {
+    console.log(user)
+    activeUser.forEach(el => {
+        if (el.username === user) {
+            el.conn.close()
+            vidUser.forEach(vid => {
+                if (vid.peerID === el.peerID)
+                    vid.call.close()
+            })
+        }
+    })
+}
+
+const listenEnter = event => {
+    if (event.keyCode === 13)
+        handleMsg()
+}
