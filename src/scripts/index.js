@@ -1,24 +1,37 @@
-import { activeUsers, connection } from "./constants/constants";
-import { addMsgToDom } from "./utils/addMsgToDom";
+import { peer } from './constants/constants';
+import { peerID, initPacket } from './constants/constants';
 
-const main = () => {
-    return activeUsers.length > 0
-}
-
-const manageNotifs = (notif, type) => {
-    addMsgToDom(notif, type, target = document.querySelector('.notifs'));
-}
-
-const handleMsg = () => {
-    const msg = document.querySelector('#inputMsg').value
-    console.log('[SENDING MESSAGE]')
-    if (!main())
-        connection.send({ msg, by: username, type: 'msg' })
-    else {
-        activeUsers.forEach(user => {
-            user.conn.send({ msg, by: username, type: 'msg' })
-        })
-        addMsgToDom({ msg, by: username }, 'msg')
+peer.on('open', id => {
+    let res = 'N'
+    while (res === 'N') {
+        username = prompt('Please enter your name to continue')
+        if (username) {
+            res = 'Y'
+        }
     }
-    document.querySelector('#inputMsg').value = ''
-}
+    peerID = id
+    initPacket.peerID = peerID
+    initPacket.username = username
+    console.log('[INIT PACKET]', initPacket)
+})
+
+peer.on('call', async (call) => {
+    console.log('[INCOMING CALL RECEIVED]')
+    manageNotifs('Incoming call received', 'notifSuccess')
+    call.answer(shareStream)
+    call.on('error', err => {
+        alert('[ERROR BEFORE RECEIVING]' + err)
+    })
+})
+
+peer.on('connection', conn => {
+    console.log('[CONNECTED SUCCESSFULLY]', conn.metadata)
+    connectionData(conn, 'master')
+    addMsgToDom(conn.metadata, 'connection')
+})
+
+peer.on('disconnected', () => peer.reconnect())
+
+peer.on('error', (err) => {
+    manageNotifs('Error while making connection', 'notifFail')
+})

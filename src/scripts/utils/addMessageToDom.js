@@ -1,4 +1,4 @@
-export const addMsgToDom = (data, type, target = document.querySelector('.msgBox')) => {
+export const addMessageToDom = (data, type, target = document.querySelector('.msgBox')) => {
     switch (type) {
         case 'msg':
             target.innerHTML += `<div class='msg'>${data.by}: ${data.msg}</div>`

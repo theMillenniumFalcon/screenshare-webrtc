@@ -1,8 +1,10 @@
 export const createEmptyAudioTrack = () => {
-    const ctx = new AudioContext()
-    const oscillator = ctx.createOscillator()
-    const dst = oscillator.connect(ctx.createMediaStreamDestination())
+    const audioContext = new AudioContext()
+    const oscillator = audioContext.createOscillator()
+
+    const dst = oscillator.connect(audioContext.createMediaStreamDestination())
     oscillator.start()
+
     const track = dst.stream.getAudioTracks()[0]
     return Object.assign(track, { enabled: false })
 }
