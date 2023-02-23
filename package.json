@@ -1,0 +1,23 @@
+{
+  "name": "screenshare-webrtc",
+  "version": "1.0.0",
+  "description": "The application intends to let anyone share their screen with one or more number of people.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/theMillenniumFalcon/screenshare-webrtc.git"
+  },
+  "keywords": [],
+  "author": "theMillenniumFalcon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/theMillenniumFalcon/screenshare-webrtc/issues"
+  },
+  "homepage": "https://github.com/theMillenniumFalcon/screenshare-webrtc#readme",
+  "dependencies": {
+    "peerjs": "^1.4.7"
+  }
+}
